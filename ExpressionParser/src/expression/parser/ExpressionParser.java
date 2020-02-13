@@ -1,20 +1,31 @@
 package expression.parser;
 
-import expression.*;
+import expression.exceptions.*;
+import expression.operators.*;
 
-import java.util.List;
 import java.util.Map;
 
 public class ExpressionParser extends BaseParser implements Parser {
 
-    private static final int MAX_LEVEL = 2;
-    private String lastOperator = "";
+     private static Map<String, BinaryOperator> prefixToBinaryOperator = Map.of(
+            "", BinaryOperator.Undefined,
+            "+", BinaryOperator.Add,
+            "-", BinaryOperator.Sub,
+            "*", BinaryOperator.Mul,
+            "/", BinaryOperator.Div,
+            "**", BinaryOperator.Pow,
+            "//", BinaryOperator.Log
+     );
 
-    private static List<String>[]  levels = new List[]{
-            List.of("+", "-"),
-            List.of("/", "*"),
-      //      List.of("**")
-    };
+     private static Map<String, UnaryOperator> prefixToUnaryOperator = Map.of(
+             "l", UnaryOperator.Log2,
+             "p", UnaryOperator.Pow2,
+             "-", UnaryOperator.Minus
+     );
+
+    private BinaryOperator lastBinaryOperator = BinaryOperator.Undefined;
+    private UnaryOperator lastUnaryOperator = UnaryOperator.Undefined;
+    private static final int MAX_LEVEL = 3;
 
     public CommonExpression parse(String expression) {
         setSource(new StringSource(expression));
@@ -23,7 +34,10 @@ public class ExpressionParser extends BaseParser implements Parser {
         if (test('\0')) {
             return result;
         }
-        throw error("Unknown character: " + ch);
+        if (ch == ')') {
+            throw new MissingBracketException("open");
+        }
+        throw new UnknownSymbolException(ch + "");
     }
 
     private CommonExpression parseExpression() {
@@ -35,22 +49,36 @@ public class ExpressionParser extends BaseParser implements Parser {
             return parseSimpleExpression();
         }
         CommonExpression result = parseLevel(level + 1);
-        while (hasLevelOperation(level)) {
-            result = makeBinaryExpression(lastOperator, result, parseLevel(level + 1));
+        while (hasBinaryOperationOnLevel(level)) {
+            BinaryOperator op = lastBinaryOperator;
+            lastBinaryOperator = BinaryOperator.Undefined;
+            result = makeBinaryExpression(op, result, parseLevel(level + 1));
         }
         return result;
     }
 
-    private boolean hasLevelOperation(int level) {
+    private boolean hasBinaryOperationOnLevel(int level) {
         skipWhitespace();
-        for (String s : levels[level]) {
-            if (test(s.charAt(0))) {
-                lastOperator = s;
-                expect(lastOperator.substring(1));
-                return true;
+        if (lastBinaryOperator == BinaryOperator.Undefined) {
+            StringBuilder st = new StringBuilder();
+            st.append(ch);
+            while (prefixToBinaryOperator.containsKey(st.toString())) {
+                nextChar();
+                st.append(ch);
             }
+            st.setLength(st.length() - 1);
+            lastBinaryOperator = prefixToBinaryOperator.get(st.toString());
         }
-        return false;
+        return lastBinaryOperator != BinaryOperator.Undefined && lastBinaryOperator.getLvl() == level;
+    }
+
+    private boolean hasUnaryOperationOnLevel() {
+        skipWhitespace();
+        if (prefixToUnaryOperator.containsKey(ch + "")) {
+            lastUnaryOperator = prefixToUnaryOperator.get(ch + "");
+            expect(lastUnaryOperator.toString());
+        }
+        return lastUnaryOperator != UnaryOperator.Undefined;
     }
 
     private CommonExpression parseSimpleExpression() {
@@ -59,19 +87,28 @@ public class ExpressionParser extends BaseParser implements Parser {
             CommonExpression result = parseExpression();
             skipWhitespace();
             if (ch != ')') {
-                throw error("No closing bracket");
+                throw new MissingBracketException("close");
             }
             nextChar();
             return result;
-        } else if (test('-')) {
-            skipWhitespace();
-            if (between('0', '9')) {
-                return parseConstExpression(true);
-            } else {
-                return new CheckedNegate(parseSimpleExpression());
-            }
+
         } else if (between('0', '9')) {
             return parseConstExpression(false);
+        } else if (hasUnaryOperationOnLevel()) {
+            UnaryOperator op = lastUnaryOperator;
+            lastUnaryOperator = UnaryOperator.Undefined;
+            if (op == UnaryOperator.Minus) {
+                if (between('0', '9')) {
+                    return parseConstExpression(true);
+                } else {
+                    return new CheckedNegate(parseSimpleExpression());
+                }
+            } else {
+                if (between('0', '9') || between('a', 'z')) {
+                    throw new UnknownSymbolException(ch + "");
+                }
+                return makeUnaryExpression(op, parseSimpleExpression());
+            }
         } else {
             return parseVariableExpression();
         }
@@ -95,19 +132,29 @@ public class ExpressionParser extends BaseParser implements Parser {
             nextChar();
         }
         if (st.length() == 0) {
-            throw error("No argument");
+            throw new MissingArgumentException(ch);
         }
         return new Variable(st.toString());
     }
 
-    private CommonExpression makeBinaryExpression(String operator, CommonExpression a, CommonExpression b) {
+    private CommonExpression makeBinaryExpression(BinaryOperator operator, CommonExpression a, CommonExpression b) {
         switch (operator) {
-            case ("+") : return new CheckedAdd(a, b);
-            case ("-") : return new CheckedSubtract(a, b);
-            case ("*") : return new CheckedMultiply(a, b);
-            case ("/") : return new CheckedDivide(a, b);
+            case Add : return new CheckedAdd(a, b);
+            case Sub : return new CheckedSubtract(a, b);
+            case Mul : return new CheckedMultiply(a, b);
+            case Div : return new CheckedDivide(a, b);
+            case Pow : return new CheckedPow(a, b);
+            case Log : return new CheckedLog(a, b);
         }
-        throw error("Unsupported operator: " + operator);
+        throw new UnsupportedOperatorException("binary operator: " + operator);
+    }
+
+    private CommonExpression makeUnaryExpression(UnaryOperator operator, CommonExpression a) {
+        switch (operator) {
+            case Log2: return new CheckedLog2(a);
+            case Pow2: return new CheckedPow2(a);
+        }
+        throw new UnsupportedOperatorException("unary operator: " + operator);
     }
 
     private void skipWhitespace() {

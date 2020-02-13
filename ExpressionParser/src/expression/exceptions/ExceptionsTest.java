@@ -1,7 +1,7 @@
 package expression.exceptions;
 
+import expression.operators.*;
 import expression.parser.*;
-import expression.*;
 
 
 import java.util.ArrayList;
@@ -146,7 +146,7 @@ public class ExceptionsTest extends ParserTest {
             counter.passed();
             return parse;
         } catch (final Exception e) {
-            throw new AssertionError("Parser failed", e);
+            throw new AssertionError("Parser failed + " + expression, e);
         }
     }
 

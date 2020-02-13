@@ -1,6 +1,7 @@
 package expression.parser;
 
-import expression.CommonExpression;
+import expression.operators.CommonExpression;
+import expression.exceptions.ComputationalException;
 
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)

@@ -1,6 +1,7 @@
 package expression.parser;
 
-import expression.*;
+import expression.operators.Either;
+import expression.operators.TripleExpression;
 
 import java.util.ArrayList;
 import java.util.List;

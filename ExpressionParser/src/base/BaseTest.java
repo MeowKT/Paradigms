@@ -1,8 +1,6 @@
 package base;
 
-import base.Asserts;
-import base.TestCounter;
-import expression.TripleExpression;
+import expression.operators.TripleExpression;
 
 import java.util.*;
 

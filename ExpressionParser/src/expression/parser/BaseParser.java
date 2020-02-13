@@ -1,5 +1,7 @@
 package expression.parser;
 
+import expression.exceptions.ParsingException;
+
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
@@ -40,7 +42,7 @@ public class BaseParser {
         return from <= ch && ch <= to;
     }
 
-    protected ParserException error(String message) {
+    protected ParsingException error(String message) {
         return source.error(message);
     }
 }
