@@ -91,6 +91,7 @@ public abstract class IntegerOperation {
     }
 
     public static int safePow(int x, int y) {
+
         if (x == 0 && y == 0) {
             throw new IllegalOperationException("0 ** 0 is not determinate");
         }
@@ -113,15 +114,15 @@ public abstract class IntegerOperation {
         int result = 1;
         try {
             while (y > 0) {
-                if ((y & 1) == 0) {
-                    x = safeMultiply(x, x);
-                    y >>= 1;
+                if ((y & 1) == 1) {
+                    result = safeMultiply(result, x);
                 }
-                result = safeMultiply(result, x);
-                y--;
+                if (y > 1)
+                    x = safeMultiply(x, x);
+                y >>= 1;
             }
         } catch (OverflowException e) {
-            throw new OverflowException("Pow overflow");
+            throw new OverflowException("Pow");
         }
         return result;
     }

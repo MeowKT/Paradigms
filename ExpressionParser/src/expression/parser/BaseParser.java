@@ -8,13 +8,19 @@ import expression.exceptions.ParsingException;
 public class BaseParser {
     private ExpressionSource source;
     protected char ch;
+    protected int pos = 0;
 
     protected void setSource(ExpressionSource source) {
         this.source = source;
     }
 
     protected void nextChar() {
-        ch = source.hasNext() ? source.next() : '\0';
+        if (source.hasNext()) {
+            ch = source.next();
+            pos++;
+        } else {
+            ch = '\0';
+        }
     }
 
     protected boolean test(char expected) {

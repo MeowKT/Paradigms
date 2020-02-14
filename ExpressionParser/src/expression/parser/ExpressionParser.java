@@ -35,9 +35,9 @@ public class ExpressionParser extends BaseParser implements Parser {
             return result;
         }
         if (ch == ')') {
-            throw new MissingBracketException("open");
+            throw new MissingBracketException("open", pos);
         }
-        throw new UnknownSymbolException(ch + "");
+        throw new UnknownSymbolException(ch + "", pos);
     }
 
     private CommonExpression parseExpression() {
@@ -87,7 +87,7 @@ public class ExpressionParser extends BaseParser implements Parser {
             CommonExpression result = parseExpression();
             skipWhitespace();
             if (ch != ')') {
-                throw new MissingBracketException("close");
+                throw new MissingBracketException("close", pos);
             }
             nextChar();
             return result;
@@ -105,7 +105,7 @@ public class ExpressionParser extends BaseParser implements Parser {
                 }
             } else {
                 if (between('0', '9') || between('a', 'z')) {
-                    throw new UnknownSymbolException(ch + "");
+                    throw new UnknownSymbolException(ch + "", pos);
                 }
                 return makeUnaryExpression(op, parseSimpleExpression());
             }
@@ -132,7 +132,7 @@ public class ExpressionParser extends BaseParser implements Parser {
             nextChar();
         }
         if (st.length() == 0) {
-            throw new MissingArgumentException(ch);
+            throw new MissingArgumentException(ch, pos);
         }
         return new Variable(st.toString());
     }
@@ -146,7 +146,7 @@ public class ExpressionParser extends BaseParser implements Parser {
             case Pow : return new CheckedPow(a, b);
             case Log : return new CheckedLog(a, b);
         }
-        throw new UnsupportedOperatorException("binary operator: " + operator);
+        throw new UnsupportedOperatorException("binary operator: " + operator, pos);
     }
 
     private CommonExpression makeUnaryExpression(UnaryOperator operator, CommonExpression a) {
@@ -154,7 +154,7 @@ public class ExpressionParser extends BaseParser implements Parser {
             case Log2: return new CheckedLog2(a);
             case Pow2: return new CheckedPow2(a);
         }
-        throw new UnsupportedOperatorException("unary operator: " + operator);
+        throw new UnsupportedOperatorException("unary operator: " + operator, pos);
     }
 
     private void skipWhitespace() {

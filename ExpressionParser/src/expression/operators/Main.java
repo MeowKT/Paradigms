@@ -7,6 +7,6 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws ComputationalException {
-        System.out.println(new ExpressionParser().parse("2 2"));
+        System.out.println(new ExpressionParser().parse("3 ** (4 * 8)").evaluate(3,2,8));
     }
 }
