@@ -39,6 +39,7 @@ public class BaseParser {
     }
 
     protected void expect(final String value) {
+        if (value.equals("")) return;
         for (char c : value.toCharArray()) {
             expect(c);
         }

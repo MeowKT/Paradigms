@@ -18,6 +18,7 @@ public class ExpressionParser extends BaseParser implements Parser {
      );
 
      private static Map<String, UnaryOperator> prefixToUnaryOperator = Map.of(
+             "", UnaryOperator.Undefined,
              "l", UnaryOperator.Log2,
              "p", UnaryOperator.Pow2,
              "-", UnaryOperator.Minus
@@ -33,9 +34,6 @@ public class ExpressionParser extends BaseParser implements Parser {
         CommonExpression result = parseExpression();
         if (test('\0')) {
             return result;
-        }
-        if (ch == ')') {
-            throw new MissingBracketException("open", pos);
         }
         throw new UnknownSymbolException(ch + "", pos);
     }
@@ -72,11 +70,20 @@ public class ExpressionParser extends BaseParser implements Parser {
         return lastBinaryOperator != BinaryOperator.Undefined && lastBinaryOperator.getLvl() == level;
     }
 
-    private boolean hasUnaryOperationOnLevel() {
+    private boolean hasUnaryOperation() {
         skipWhitespace();
-        if (prefixToUnaryOperator.containsKey(ch + "")) {
-            lastUnaryOperator = prefixToUnaryOperator.get(ch + "");
-            expect(lastUnaryOperator.toString());
+        if (lastUnaryOperator == UnaryOperator.Undefined) {
+            StringBuilder st = new StringBuilder();
+            st.append(ch);
+            while (prefixToUnaryOperator.containsKey(st.toString())) {
+                nextChar();
+                st.append(ch);
+            }
+            st.setLength(st.length() - 1);
+            lastUnaryOperator = prefixToUnaryOperator.get(st.toString());
+            if (st.length() > 0) {
+                expect(lastUnaryOperator.toString().substring(1));
+            }
         }
         return lastUnaryOperator != UnaryOperator.Undefined;
     }
@@ -91,10 +98,9 @@ public class ExpressionParser extends BaseParser implements Parser {
             }
             nextChar();
             return result;
-
         } else if (between('0', '9')) {
             return parseConstExpression(false);
-        } else if (hasUnaryOperationOnLevel()) {
+        } else if (hasUnaryOperation()) {
             UnaryOperator op = lastUnaryOperator;
             lastUnaryOperator = UnaryOperator.Undefined;
             if (op == UnaryOperator.Minus) {
@@ -122,7 +128,7 @@ public class ExpressionParser extends BaseParser implements Parser {
         try {
             return new Const(Integer.parseInt(st.toString()));
         } catch (NumberFormatException e) {
-            throw error("Constant overflow: " + st);
+            throw new IllegalConstantException("Constant overflow: " + st, pos);
         }
     }
     private CommonExpression parseVariableExpression() {

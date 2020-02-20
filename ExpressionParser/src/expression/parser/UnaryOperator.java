@@ -5,6 +5,7 @@ import java.util.Map;
 public enum UnaryOperator {
     Pow2, Log2, Minus, Undefined;
     private static final Map<UnaryOperator, String> operatorToString = Map.of(
+            Undefined, "",
             Minus, "-",
             Pow2, "pow2",
             Log2, "log2"

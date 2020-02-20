@@ -74,24 +74,7 @@ public abstract class IntegerOperation {
         return multiply(x, y);
     }
 
-    public static int pow(int x, int y) {
-        if (Math.abs(x) <= 1 && y > 2) {
-            y = (y - 1) % 2 + 1; /// faster then binpow
-        }
-        int result = 1;
-        while (y > 0) {
-            if ((y & 1) == 0) {
-                x *= x;
-                y >>= 1;
-            }
-            result *= x;
-            y--;
-        }
-        return result;
-    }
-
     public static int safePow(int x, int y) {
-
         if (x == 0 && y == 0) {
             throw new IllegalOperationException("0 ** 0 is not determinate");
         }
@@ -111,39 +94,31 @@ public abstract class IntegerOperation {
             return 1 << y;
         }
 
-        int result = 1;
         try {
+            int result = 1;
             while (y > 0) {
                 if ((y & 1) == 1) {
                     result = safeMultiply(result, x);
                 }
-                if (y > 1)
+                if (y > 1) {
                     x = safeMultiply(x, x);
+                }
                 y >>= 1;
             }
+            return result;
         } catch (OverflowException e) {
             throw new OverflowException("Pow");
         }
-        return result;
     }
 
 
     public static int log(int x, int y) {
-        int l = 0, r = 32;
-        while (r - l > 1) {
-            int m = r + l >> 1;
-            try {
-                if (safePow(y, m) <= x) {
-                    l = m;
-                } else {
-                    r = m;
-                }
-            } catch (ComputationalException e) {
-                r = m;
-            }
+        int result = 0, current = 1;
+        while (current <= x / y) {
+            current *= y;
+            result++;
         }
-
-        return l;
+        return result;
     }
 
     public static int safeLog(int x, int y) {
