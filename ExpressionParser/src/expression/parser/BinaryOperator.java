@@ -3,7 +3,7 @@ package expression.parser;
 import java.util.Map;
 
 public enum BinaryOperator {
-    Add, Sub, Mul, Div, Pow, Undefined, Log, Pow2, Log2;
+    Add, Sub, Mul, Div, Pow, UNDEFINED, Log, Pow2, Log2;
     private static final Map<BinaryOperator, String> operatorToString = Map.of(
             Add, "+",
             Sub, "-",
@@ -14,7 +14,7 @@ public enum BinaryOperator {
     );
 
     private static final Map<BinaryOperator, Integer> OPERATOR_LVL = Map.of(
-            Undefined, 3,
+            UNDEFINED, 3,
             Add, 0,
             Sub, 0,
             Mul, 1,

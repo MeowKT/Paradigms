@@ -58,6 +58,7 @@ public abstract class IntegerOperation {
         if (x == 0 || y == 0 || x == 1 || y == 1) {
             return multiply(x, y);
         }
+
         if (y == Integer.MIN_VALUE || x == Integer.MIN_VALUE) {
             throw new OverflowException("Multiply");
         }

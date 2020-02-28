@@ -8,7 +8,7 @@ import java.util.Map;
 public class ExpressionParser extends BaseParser implements Parser {
 
      private static Map<String, BinaryOperator> prefixToBinaryOperator = Map.of(
-            "", BinaryOperator.Undefined,
+            "", BinaryOperator.UNDEFINED,
             "+", BinaryOperator.Add,
             "-", BinaryOperator.Sub,
             "*", BinaryOperator.Mul,
@@ -24,7 +24,7 @@ public class ExpressionParser extends BaseParser implements Parser {
              "-", UnaryOperator.Minus
      );
 
-    private BinaryOperator lastBinaryOperator = BinaryOperator.Undefined;
+    private BinaryOperator lastBinaryOperator = BinaryOperator.UNDEFINED;
     private UnaryOperator lastUnaryOperator = UnaryOperator.Undefined;
     private static final int MAX_LEVEL = 3;
 
@@ -49,7 +49,7 @@ public class ExpressionParser extends BaseParser implements Parser {
         CommonExpression result = parseLevel(level + 1);
         while (hasBinaryOperationOnLevel(level)) {
             BinaryOperator op = lastBinaryOperator;
-            lastBinaryOperator = BinaryOperator.Undefined;
+            lastBinaryOperator = BinaryOperator.UNDEFINED;
             result = makeBinaryExpression(op, result, parseLevel(level + 1));
         }
         return result;
@@ -57,7 +57,7 @@ public class ExpressionParser extends BaseParser implements Parser {
 
     private boolean hasBinaryOperationOnLevel(int level) {
         skipWhitespace();
-        if (lastBinaryOperator == BinaryOperator.Undefined) {
+        if (lastBinaryOperator == BinaryOperator.UNDEFINED) {
             StringBuilder st = new StringBuilder();
             st.append(ch);
             while (prefixToBinaryOperator.containsKey(st.toString())) {
@@ -67,7 +67,7 @@ public class ExpressionParser extends BaseParser implements Parser {
             st.setLength(st.length() - 1);
             lastBinaryOperator = prefixToBinaryOperator.get(st.toString());
         }
-        return lastBinaryOperator != BinaryOperator.Undefined && lastBinaryOperator.getLvl() == level;
+        return lastBinaryOperator != BinaryOperator.UNDEFINED && lastBinaryOperator.getLvl() == level;
     }
 
     private boolean hasUnaryOperation() {
@@ -133,7 +133,7 @@ public class ExpressionParser extends BaseParser implements Parser {
     }
     private CommonExpression parseVariableExpression() {
         StringBuilder st = new StringBuilder();
-        while(between('x', 'z')) {
+        while (between('x', 'z')) {
             st.append(ch);
             nextChar();
         }
@@ -151,8 +151,8 @@ public class ExpressionParser extends BaseParser implements Parser {
             case Div : return new CheckedDivide(a, b);
             case Pow : return new CheckedPow(a, b);
             case Log : return new CheckedLog(a, b);
+            default: throw new UnsupportedOperatorException("binary operator: " + operator, pos);
         }
-        throw new UnsupportedOperatorException("binary operator: " + operator, pos);
     }
 
     private CommonExpression makeUnaryExpression(UnaryOperator operator, CommonExpression a) {
