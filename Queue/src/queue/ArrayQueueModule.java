@@ -4,15 +4,22 @@ package queue;
 // a - sequence
 
 public class ArrayQueueModule {
-    /** Inv :
+    /**
+     * Inv :
      * n >= 0
      * and for all i : a[i] != null
      */
     private static Object elements[] = new Object[1];
     private static int tail = 0, head = 0;
 
-    /** Pre :
+    /**
+     * Pre :
      * x != null
+     *
+     * Post :
+     * n' = n + 1
+     * and a[i]' = a[i] for i in 0..n - 1
+     * and a[n]' = x
      */
     public static void enqueue(Object x) {
         assert x != null;
@@ -21,14 +28,15 @@ public class ArrayQueueModule {
         elements[tail] = x;
         tail = next(tail);
     }
-    /** Post :
-     * n' = n + 1
-     * and a[i]' = a[i] for i in 0..n - 1
-     * and a[n]' = x
-     */
 
-    /** Pre:
+    /**
+     * Pre:
      * x != null
+     *
+     * Post :
+     * n' = n + 1
+     * and a[i + 1]' = a[i] for i in 0..n - 1
+     * and a[0]' = x
      */
     public static void push(Object x) {
         assert x != null;
@@ -37,54 +45,58 @@ public class ArrayQueueModule {
         head = prev(head);
         elements[head] = x;
     }
-    /** Post :
-     * n' = n + 1
-     * and a[i + 1]' = a[i] for i in 0..n - 1
-     * and a[0]' = x
-     */
 
-    /** Pre:
+    /**
+     * Pre:
      * n > 0
+     *
+     * Post :
+     * n' = n
+     * and a[i]' = a[i] for i in 0..n - 1
+     * and Result = a[0]'
      */
     public static Object element() {
         assert tail != head;
 
         return elements[head];
     }
-    /** Post :
-     * n' = n
-     * and a[i]' = a[i] for i in 0..n - 1
-     * and Result = a[0]'
-     */
 
-    /** Pre:
+    /**
+     * Pre:
      * n > 0
-     */
-    public static Object peek() {
-        return elements[prev(tail)];
-    }
-    /** Post :
+     *
+     * Post :
      * n' = n
      * and a[i]' = a[i] for i in 0..n - 1
      * and Result = a[n - 1]'
      */
+    public static Object peek() {
+        return elements[prev(tail)];
+    }
 
-    /** Pre:
+    /**
+     * Pre:
      * n > 0
+     *
+     * Post:
+     * n' == n - 1
+     * and (a'[i - 1] == a[i] for i in 1..n - 1)
+     * and (Result == a[0])
      */
     public static Object dequeue() {
         Object x = element();
         head = next(head);
         return x;
     }
-    /** Post:
-     * n' == n - 1
-     * and (a'[i - 1] == a[i] for i in 1..n - 1)
-     * and (Result == a[0])
-     */
 
-    /** Pre:
+    /**
+     * Pre:
      * size > 0
+     *
+     * Post:
+     * n' == n - 1
+     * and (a'[i] == a[i] for i = 0...n - 2)
+     * and (Result == a[n - 1])
      */
     public static Object remove() {
         Object x = peek();
@@ -92,36 +104,42 @@ public class ArrayQueueModule {
         elements[tail] = null;
         return x;
     }
-    /** Post:
-     * n' == n - 1
-     * and (a'[i] == a[i] for i = 0...n - 2)
-     * and (Result == a[n - 1])
-     */
 
-    /** Pre:
+    /**
+     * Pre:
      * ind in 0..n - 1
+     *
+     * Post:
+     * Result = a[ind]
+     * and a[i]' = a[i] for i in 0..n-1
      */
     public static Object get(int ind) {
         return elements[(head + ind) % elements.length];
     }
-    /** Post:
-     * Result = a[ind]
-     * and a[i]' = a[i] for i in 0..n-1
-     */
 
-    /** Pre:
+    /**
+     * Pre:
      * ind in 0..size
      * el != null
-     */
-    public static void set(int ind, Object element) {
-        elements[(head + ind) % elements.length] = element;
-    }
-    /** Post:
+     *
+     * Post:
      * a[i]' = a[i] for i in 0..ind-1
      * and a[i]' = a[i] for i in ind+1..n-1
      * a[ind]' = el
      */
+    public static void set(int ind, Object element) {
+        elements[(head + ind) % elements.length] = element;
+    }
 
+    /**
+     * Pre:
+     * true
+     *
+     * Post:
+     * Result = n
+     * and n' = n
+     * and a[i'] = a[i] for i in 0..n-1
+     */
     public static int size() {
         if (head > tail) {
             return elements.length - head + tail;
@@ -129,14 +147,14 @@ public class ArrayQueueModule {
             return tail - head;
         }
     }
-    /** Post:
-     * Result = n
-     * and n' = n
-     * and a[i'] = a[i] for i in 0..n-1
-     */
 
-    /**Pre:
+    /**
+     * Pre:
      * sz >= 0
+     *
+     * Post:
+     * (n' == n)
+     * and (a[i]' == a[i] for i = 0...n - 1)
      */
     private static void resize(int size) {
         if (size == elements.length) {
@@ -152,44 +170,52 @@ public class ArrayQueueModule {
             tail = sz - 1;
         }
     }
-    /** Post:
-     * (n' == n) && (a[i]' == a[i] for i = 0...n - 1)
-     */
 
-    public static boolean isEmpty() {
-        return tail == head;
-    }
-    /** Post:
+    /**
+     * Pre:
+     * true
+     *
+     * Post:
      * Result = (size == 0)
      * n' = n
      * and a[i'] = a[i] for i in 0..n-1
      */
 
+    public static boolean isEmpty() {
+        return tail == head;
+    }
+
+    /**
+     * Pre:
+     * true
+     *
+     * Post:
+     * n' = 0
+     */
     public static void clear() {
         tail = head = 0;
         elements = new Object[1];
     }
-    /** Post:
-     *  n' = 0
-     */
 
-    /** Pre: (elements.length != 0)
+    /**
+     * Pre: (elements.length != 0)
      * and (0 <= x < elements.length)
+     *
+     * Post:
+     * Result = (x + 1) % elements.length
      */
     private static int next(int x) {
         return (x + 1) % elements.length;
     }
-    /** Post:
-     * Result = (x + 1) % elements.length
-     */
 
-    /** Pre: (elements.length != 0)
+    /**
+     * Pre: (elements.length != 0)
      * and (0 <= x < elements.length)
+     *
+     * Post:
+     * Result = (x - 1 + elements.length) % elements.length
      */
     private static int prev(int x) {
         return (x - 1 + elements.length) % elements.length;
     }
-    /** Post:
-     * Result = (x - 1 + elements.length) % elements.length
-     */
 }

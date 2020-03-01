@@ -4,16 +4,23 @@ package queue;
 // a - sequence
 
 public class ArrayQueueADT {
-    /** Inv :
+    /**
+     * Inv :
      * n >= 0
      * and for all i : a[i] != null
      */
     private Object[] elements = new Object[1];
     private int tail = 0, head = 0;
 
-    /** Pre :
+    /**
+     * Pre :
      * queue != null
      * and x != null
+     *
+     * Post :
+     * n' = n + 1
+     * and a[i]' = a[i] for i in 0..n - 1
+     * and a[n]' = x
      */
     public static void enqueue(ArrayQueueADT queue, Object x) {
         assert x != null;
@@ -22,15 +29,16 @@ public class ArrayQueueADT {
         queue.elements[queue.tail] = x;
         queue.tail = next(queue, queue.tail);
     }
-    /** Post :
-     * n' = n + 1
-     * and a[i]' = a[i] for i in 0..n - 1
-     * and a[n]' = x
-     */
 
-    /** Pre:
+    /**
+     * Pre:
      * queue != null
      * and x != null
+     *
+     * Post :
+     * n' = n + 1
+     * and a[i + 1]' = a[i] for i in 0..n - 1
+     * and a[0]' = x
      */
     public static void push(ArrayQueueADT queue, Object x) {
         assert x != null;
@@ -39,43 +47,46 @@ public class ArrayQueueADT {
         queue.head = prev(queue, queue.head);
         queue.elements[queue.head] = x;
     }
-    /** Post :
-     * n' = n + 1
-     * and a[i + 1]' = a[i] for i in 0..n - 1
-     * and a[0]' = x
-     */
 
-    /** Pre:
+    /**
+     * Pre:
      * queue != null
      * and n > 0
+     *
+     * Post :
+     * n' = n
+     * and a[i]' = a[i] for i in 0..n - 1
+     * and Result = a[0]'
      */
     public static Object element(ArrayQueueADT queue) {
         assert queue.head != queue.tail;
 
         return queue.elements[queue.head];
     }
-    /** Post :
-     * n' = n
-     * and a[i]' = a[i] for i in 0..n - 1
-     * and Result = a[0]'
-     */
 
-    /** Pre:
+    /**
+     * Pre:
      * queue != null
      * and n > 0
-     */
-    public static Object peek(ArrayQueueADT queue) {
-        return queue.elements[prev(queue, queue.tail)];
-    }
-    /** Post :
+     *
+     * Post :
      * n' = n
      * and a[i]' = a[i] for i in 0..n - 1
      * and Result = a[n - 1]'
      */
+    public static Object peek(ArrayQueueADT queue) {
+        return queue.elements[prev(queue, queue.tail)];
+    }
 
-    /** Pre:
+    /**
+     * Pre:
      * queue != null
      * and n > 0
+     *
+     * Post:
+     * n' == n - 1
+     * and (a'[i - 1] == a[i] for i in 1..n - 1)
+     * and (Result == a[0])
      */
     public static Object dequeue(ArrayQueueADT queue) {
         assert queue.head != queue.tail;
@@ -84,15 +95,16 @@ public class ArrayQueueADT {
         queue.head = next(queue, queue.head);
         return x;
     }
-    /** Post:
-     * n' == n - 1
-     * and (a'[i - 1] == a[i] for i in 1..n - 1)
-     * and (Result == a[0])
-     */
 
-    /** Pre:
+    /**
+     * Pre:
      * queue != null
      * and size > 0
+     *
+     * Post:
+     * n' == n - 1
+     * and (a'[i] == a[i] for i = 0...n - 2)
+     * and (Result == a[n - 1])
      */
     public static Object remove(ArrayQueueADT queue) {
         Object x = peek(queue);
@@ -100,41 +112,46 @@ public class ArrayQueueADT {
         queue.elements[queue.tail] = null;
         return x;
     }
-    /** Post:
-     * n' == n - 1
-     * and (a'[i] == a[i] for i = 0...n - 2)
-     * and (Result == a[n - 1])
-     */
 
-    /** Pre:
+    /**
+     * Pre:
      * queue != null
      * and ind in 0..n - 1
-     */
-    public static Object get(ArrayQueueADT queue, int ind) {
-        return queue.elements[(queue.head + ind) % queue.elements.length];
-    }
-    /** Post:
+     *
+     * Post:
      * Result = a[ind]
      * and a[i]' = a[i] for i in 0..n-1
      */
 
-    /** Pre:
+    public static Object get(ArrayQueueADT queue, int ind) {
+        return queue.elements[(queue.head + ind) % queue.elements.length];
+    }
+
+    /**
+     * Pre:
      * queue != null
      * and ind in 0..size
      * and el != null
-     */
-    public static void set(ArrayQueueADT queue, int ind, Object element) {
-        queue.elements[(queue.head + ind) % queue.elements.length] = element;
-    }
-    /** Post:
+     *
+     * Post:
      * a[i]' = a[i] for i in 0..ind-1
      * and a[i]' = a[i] for i in ind+1..n-1
      * a[ind]' = el
      */
+    public static void set(ArrayQueueADT queue, int ind, Object element) {
+        queue.elements[(queue.head + ind) % queue.elements.length] = element;
+    }
 
-    /** Pre:
+    /**
+     * Pre:
      * queue != null
+     *
+     * Post:
+     * Result = n
+     * and n' = n
+     * and a[i'] = a[i] for i in 0..n-1
      */
+
     public static int size(ArrayQueueADT queue) {
         if (queue.head > queue.tail) {
             return queue.elements.length - queue.head + queue.tail;
@@ -142,15 +159,15 @@ public class ArrayQueueADT {
             return queue.tail - queue.head;
         }
     }
-    /** Post:
-     * Result = n
-     * and n' = n
-     * and a[i'] = a[i] for i in 0..n-1
-     */
 
-    /**Pre:
+    /**
+     * Pre:
      * queue != null
      * and sz >= 0
+     *
+     * Post:
+     * (n' == n)
+     * and (a[i]' == a[i] for i = 0...n - 1)
      */
     private static void resize(ArrayQueueADT queue, int size) {
         if (size == queue.elements.length) {
@@ -166,54 +183,57 @@ public class ArrayQueueADT {
             queue.tail = sz - 1;
         }
     }
-    /** Post:
-     * (n' == n) && (a[i]' == a[i] for i = 0...n - 1)
-     */
 
-    /** Pre:
+    /**
+     * Pre:
      * queue != null
-     */
-    public static boolean isEmpty(ArrayQueueADT queue) {
-        return queue.tail == queue.head;
-    }
-    /** Post:
+     *
+     * Post:
      * Result = (size == 0)
      * n' = n
      * and a[i'] = a[i] for i in 0..n-1
      */
+    public static boolean isEmpty(ArrayQueueADT queue) {
+        return queue.tail == queue.head;
+    }
 
-    /** Pre:
+    /**
+     * Pre:
      * queue != null
+     *
+     * Post:
+     * n' = 0
      */
     public static void clear(ArrayQueueADT queue) {
         queue.tail = queue.head = 0;
         queue.elements = new Object[1];
     }
-    /** Post:
-     *  n' = 0
-     */
 
-    /** Pre:
+    /**
+     * Pre:
      * queue != null
      * and (queue.elements.length != 0)
      * and (0 <= x < elements.length)
-     */
-    private static int next(ArrayQueueADT queue, int x) {
-        return (x + 1) % queue.elements.length;
-    }
-    /** Post:
+     *
+     * Post:
      * Result = (x + 1) % elements.length
      */
 
-    /** Pre:
+    private static int next(ArrayQueueADT queue, int x) {
+        return (x + 1) % queue.elements.length;
+    }
+
+    /**
+     * Pre:
      * queue != null
      * and (queue,elements.length != 0)
      * and (0 <= x < elements.length)
+     *
+     * Post:
+     * Result = (x - 1 + queue.elements.length) % elements.length
      */
     private static int prev(ArrayQueueADT queue, int x) {
         return (x - 1 + queue.elements.length) % queue.elements.length;
     }
-    /** Post:
-     * Result = (x - 1 + queue.elements.length) % elements.length
-     */
+
 }
