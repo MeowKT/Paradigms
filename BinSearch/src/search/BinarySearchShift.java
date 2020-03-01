@@ -65,11 +65,15 @@ public class BinarySearchShift {
      * or (res < a.size and a[res] > a.back and (res == a.size - 1 or a[res + 1] < a[res]))
      */
 
-    /** Pre: (a[i]' == a[i])
+    /** Pre:
      * and ({e_{k + 1}.. e_{n}, e_1.. e_k} for all i, j : i < j <-> a[i] < a[j])
      * and (r == a.size or (r < a.size and a[r] <= a.back))
      * and (l == -1 or (0 <= l < a.size and a[l] > a.back))
-     * r' - l' < r - l
+     * and l < r
+     * and r' - l' < r - l
+     */
+    /** Post: (a[i]' == a[i])
+     * and res == -1 or (a[res] > a.back() and (res == a.size() - 1 or a[res + 1] < a.back))
      */
     static int binRec(int[] a, int l, int r) {
         // Pre
@@ -107,9 +111,6 @@ public class BinarySearchShift {
             }
         }
     }
-    /** Post: (a[i]' == a[i])
-     * and res == -1 or (a[res] > a.back() and (res == a.size() - 1 or a[res + 1] < a.back))
-     */
 
 
     /** Pre
@@ -124,8 +125,8 @@ public class BinarySearchShift {
             a[i] = Integer.parseInt(args[i]);
         }
 
-        int ans = binRec(a, -1, n);
-        //int ans = binIter(a);
+        int ans = binIter(a);
+        //int ans = binRec(a, -1, n);
 
         System.out.println(ans);
     }
