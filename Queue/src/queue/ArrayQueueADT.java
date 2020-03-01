@@ -80,7 +80,7 @@ public class ArrayQueueADT {
     public static Object dequeue(ArrayQueueADT queue) {
         assert queue.head != queue.tail;
 
-        Object x = queue.elements[queue.head];
+        Object x = element(queue);
         queue.head = next(queue, queue.head);
         return x;
     }
@@ -95,8 +95,8 @@ public class ArrayQueueADT {
      * and size > 0
      */
     public static Object remove(ArrayQueueADT queue) {
+        Object x = peek(queue);
         queue.tail = prev(queue, queue.tail);
-        Object x = queue.elements[queue.tail];
         queue.elements[queue.tail] = null;
         return x;
     }

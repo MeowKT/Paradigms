@@ -3,21 +3,26 @@ package queue;
 // n - count elements
 // a - sequence
 
-public class ArrayQueueModule {
+public class ArrayQueue extends AbstractQueue implements Queue {
     /** Inv :
      * n >= 0
      * and for all i : a[i] != null
      */
-    private static Object elements[] = new Object[1];
-    private static int tail = 0, head = 0;
+    private Object[] elements;
+    private int tail, head;
+
+    public ArrayQueue() {
+        tail = head = 0;
+        elements = new Object[1];
+    }
 
     /** Pre :
      * x != null
      */
-    public static void enqueue(Object x) {
+    public void enqueue(Object x) {
         assert x != null;
 
-        resize(size() + 1);
+        ensureCapacity(size() + 1);
         elements[tail] = x;
         tail = next(tail);
     }
@@ -30,10 +35,10 @@ public class ArrayQueueModule {
     /** Pre:
      * x != null
      */
-    public static void push(Object x) {
+    public void push(Object x) {
         assert x != null;
 
-        resize(size() + 1);
+        ensureCapacity(size() + 1);
         head = prev(head);
         elements[head] = x;
     }
@@ -46,9 +51,7 @@ public class ArrayQueueModule {
     /** Pre:
      * n > 0
      */
-    public static Object element() {
-        assert tail != head;
-
+    public Object element() {
         return elements[head];
     }
     /** Post :
@@ -60,7 +63,7 @@ public class ArrayQueueModule {
     /** Pre:
      * n > 0
      */
-    public static Object peek() {
+    public Object peek() {
         return elements[prev(tail)];
     }
     /** Post :
@@ -72,8 +75,9 @@ public class ArrayQueueModule {
     /** Pre:
      * n > 0
      */
-    public static Object dequeue() {
-        Object x = element();
+    public Object dequeue() {
+        Object x = elements[head];
+        elements[head] = null;
         head = next(head);
         return x;
     }
@@ -86,9 +90,9 @@ public class ArrayQueueModule {
     /** Pre:
      * size > 0
      */
-    public static Object remove() {
-        Object x = peek();
+    public Object remove() {
         tail = prev(tail);
+        Object x = elements[tail];
         elements[tail] = null;
         return x;
     }
@@ -101,7 +105,7 @@ public class ArrayQueueModule {
     /** Pre:
      * ind in 0..n - 1
      */
-    public static Object get(int ind) {
+    public Object get(int ind) {
         return elements[(head + ind) % elements.length];
     }
     /** Post:
@@ -113,8 +117,8 @@ public class ArrayQueueModule {
      * ind in 0..size
      * el != null
      */
-    public static void set(int ind, Object element) {
-        elements[(head + ind) % elements.length] = element;
+    public void set(int ind, Object el) {
+        elements[(head + ind) % elements.length] = el;
     }
     /** Post:
      * a[i]' = a[i] for i in 0..ind-1
@@ -122,7 +126,7 @@ public class ArrayQueueModule {
      * a[ind]' = el
      */
 
-    public static int size() {
+    public int size() {
         if (head > tail) {
             return elements.length - head + tail;
         } else {
@@ -138,7 +142,7 @@ public class ArrayQueueModule {
     /**Pre:
      * sz >= 0
      */
-    private static void resize(int size) {
+    private void ensureCapacity(int size) {
         if (size == elements.length) {
             Object[] arr = new Object[2 * elements.length];
             int sz = 0;
@@ -146,17 +150,16 @@ public class ArrayQueueModule {
                 arr[sz++] = elements[head];
                 head = next(head);
             }
-            arr[sz++] = elements[head];
             elements = arr;
             head = 0;
-            tail = sz - 1;
+            tail = sz;
         }
     }
     /** Post:
      * (n' == n) && (a[i]' == a[i] for i = 0...n - 1)
      */
 
-    public static boolean isEmpty() {
+    public boolean isEmpty() {
         return tail == head;
     }
     /** Post:
@@ -165,7 +168,7 @@ public class ArrayQueueModule {
      * and a[i'] = a[i] for i in 0..n-1
      */
 
-    public static void clear() {
+    public void clear() {
         tail = head = 0;
         elements = new Object[1];
     }
@@ -176,7 +179,7 @@ public class ArrayQueueModule {
     /** Pre: (elements.length != 0)
      * and (0 <= x < elements.length)
      */
-    private static int next(int x) {
+    private int next(int x) {
         return (x + 1) % elements.length;
     }
     /** Post:
@@ -186,7 +189,7 @@ public class ArrayQueueModule {
     /** Pre: (elements.length != 0)
      * and (0 <= x < elements.length)
      */
-    private static int prev(int x) {
+    private int prev(int x) {
         return (x - 1 + elements.length) % elements.length;
     }
     /** Post:

@@ -75,7 +75,7 @@ public class ArrayQueue {
      * n > 0
      */
     public Object dequeue() {
-        Object x = elements[head];
+        Object x = element();
         elements[head] = null;
         head = next(head);
         return x;
@@ -90,8 +90,8 @@ public class ArrayQueue {
      * size > 0
      */
     public Object remove() {
+        Object x = peek();
         tail = prev(tail);
-        Object x = elements[tail];
         elements[tail] = null;
         return x;
     }
