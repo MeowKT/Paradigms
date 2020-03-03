@@ -24,7 +24,7 @@ public class ArrayQueueModule {
     public static void enqueue(Object x) {
         assert x != null;
 
-        resize(size() + 1);
+        ensureCapacity(size() + 1);
         elements[(head + size) % elements.length] = x;
         size++;
     }
@@ -41,7 +41,7 @@ public class ArrayQueueModule {
     public static void push(Object x) {
         assert x != null;
 
-        resize(size() + 1);
+        ensureCapacity(size() + 1);
         head = prev(head);
         elements[head] = x;
         size++;
@@ -153,14 +153,14 @@ public class ArrayQueueModule {
      * (n' == n)
      * and (a[i]' == a[i] for i = 0...n - 1)
      */
-    private static void resize(int size) {
+    private static void ensureCapacity(int size) {
         if (size == elements.length) {
             Object[] arr = new Object[2 * elements.length];
-            int sz = 0;
-            for (int i = 0; i < size; i++) {
-                arr[sz++] = elements[head];
-                head = next(head);
-            }
+
+            int shift = Math.min(elements.length - head, size);
+            System.arraycopy(elements, head, arr, 0, shift);
+            System.arraycopy(elements, 0, arr, shift, size - shift);
+
             elements = arr;
             head = 0;
         }

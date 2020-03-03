@@ -31,11 +31,11 @@ public class ArrayQueue extends AbstractQueue implements Queue {
     private void ensureCapacity(int size) {
         if (size == elements.length) {
             Object[] arr = new Object[2 * elements.length];
-            int sz = 0;
-            for (int i = 0; i < size; i++) {
-                arr[sz++] = elements[head];
-                head = next(head);
-            }
+
+            int shift = Math.min(elements.length - head, size);
+            System.arraycopy(elements, head, arr, 0, shift);
+            System.arraycopy(elements, 0, arr, shift, size - shift);
+
             elements = arr;
             head = 0;
         }

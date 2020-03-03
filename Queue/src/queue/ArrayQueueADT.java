@@ -25,7 +25,7 @@ public class ArrayQueueADT {
     public static void enqueue(ArrayQueueADT queue, Object x) {
         assert x != null;
 
-        resize(queue, size(queue) + 1);
+        ensureCapacity(queue, size(queue) + 1);
         queue.elements[(queue.head + queue.size) % queue.elements.length] = x;
         queue.size++;
     }
@@ -43,7 +43,7 @@ public class ArrayQueueADT {
     public static void push(ArrayQueueADT queue, Object x) {
         assert x != null;
 
-        resize(queue, size(queue) + 1);
+        ensureCapacity(queue, size(queue) + 1);
         queue.head = prev(queue, queue.head);
         queue.elements[queue.head] = x;
         queue.size++;
@@ -167,14 +167,14 @@ public class ArrayQueueADT {
      * (n' == n)
      * and (a[i]' == a[i] for i = 0...n - 1)
      */
-    private static void resize(ArrayQueueADT queue, int size) {
+    private static void ensureCapacity(ArrayQueueADT queue, int size) {
         if (size == queue.elements.length) {
             Object[] arr = new Object[2 * queue.elements.length];
-            int sz = 0;
-            for (int i = 0; i < size; i++) {
-                arr[sz++] = queue.elements[queue.head];
-                queue.head = next(queue, queue.head);
-            }
+
+            int shift = Math.min(queue.elements.length - queue.head, size);
+            System.arraycopy(queue.elements, queue.head, arr, 0, shift);
+            System.arraycopy(queue.elements, 0, arr, shift, size - shift);
+
             queue.elements = arr;
             queue.head = 0;
         }
