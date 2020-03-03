@@ -1,40 +1,29 @@
 package queue;
 
-public class LinkedQueue extends AbstractQueue implements Queue {
-    Node head, tail;
-    int size;
+public class LinkedQueue extends AbstractQueue {
+    private Node head, tail;
 
-    public void enqueue(Object element) {
-        assert element != null;
+    public LinkedQueue() {
+        head = tail = null;
+        size = 0;
+    }
 
-        size++;
+    public void enqueueImpl(Object element) {
         tail = new Node(element, tail);
-        if (head == null)
+        if (size() == 0)
             head = tail;
     }
 
-    public Object element() {
+    public Object elementImpl() {
         return head.value;
     }
 
-    public Object dequeue() {
-        size--;
-        Object x = head.value;
+    public void dequeueImpl() {
         head = head.next;
-        return x;
     }
 
-    public int size() {
-        return size;
-    }
-
-    public boolean isEmpty() {
-        return head == null;
-    }
-
-    public void clear() {
+    public void clearImpl() {
         head = tail = null;
-        size = 0;
     }
 
     private class Node {
@@ -42,9 +31,7 @@ public class LinkedQueue extends AbstractQueue implements Queue {
         private Node next;
 
         public Node(Object value, Node prev) {
-            assert value != null;
-
-            if (prev != null)
+            if (size() > 0)
                 prev.next = this;
             this.value = value;
         }

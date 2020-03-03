@@ -10,9 +10,9 @@ public class ArrayQueue {
      * and for all i : a[i] != null
      */
     private Object[] elements;
-    private int tail, head;
+    private int size, head;
     public ArrayQueue() {
-        tail = head = 0;
+        size = head = 0;
         elements = new Object[1];
     }
 
@@ -29,8 +29,8 @@ public class ArrayQueue {
         assert x != null;
 
         ensureCapacity(size() + 1);
-        elements[tail] = x;
-        tail = next(tail);
+        elements[(head + size) % elements.length] = x;
+        size++;
     }
 
     /**
@@ -48,6 +48,7 @@ public class ArrayQueue {
         ensureCapacity(size() + 1);
         head = prev(head);
         elements[head] = x;
+        size++;
     }
 
     /**
@@ -73,7 +74,7 @@ public class ArrayQueue {
      * and Result = a[n - 1]'
      */
     public Object peek() {
-        return elements[prev(tail)];
+        return elements[(head + size - 1) % elements.length];
     }
 
     /**
@@ -89,6 +90,7 @@ public class ArrayQueue {
         Object x = element();
         elements[head] = null;
         head = next(head);
+        size--;
         return x;
     }
 
@@ -103,8 +105,7 @@ public class ArrayQueue {
      */
     public Object remove() {
         Object x = peek();
-        tail = prev(tail);
-        elements[tail] = null;
+        elements[(head + (--size)) % elements.length] = null;
         return x;
     }
 
@@ -137,17 +138,14 @@ public class ArrayQueue {
     /**
      * Pre:
      * always true
+     *
      * Post:
      * Result = n
      * and n' = n
      * and a[i'] = a[i] for i in 0..n-1
      */
     public int size() {
-        if (head > tail) {
-            return elements.length - head + tail;
-        } else {
-            return tail - head;
-        }
+        return size;
     }
 
 
@@ -163,13 +161,12 @@ public class ArrayQueue {
         if (size == elements.length) {
             Object[] arr = new Object[2 * elements.length];
             int sz = 0;
-            while (tail != head) {
+            for (int i = 0; i < size; i++) {
                 arr[sz++] = elements[head];
                 head = next(head);
             }
             elements = arr;
             head = 0;
-            tail = sz;
         }
     }
 
@@ -183,7 +180,7 @@ public class ArrayQueue {
      * and a[i'] = a[i] for i in 0..n-1
      */
     public boolean isEmpty() {
-        return tail == head;
+        return size == 0;
     }
 
     /**
@@ -194,7 +191,7 @@ public class ArrayQueue {
      * n' = 0
      */
     public void clear() {
-        tail = head = 0;
+        size = head = 0;
         elements = new Object[1];
     }
 

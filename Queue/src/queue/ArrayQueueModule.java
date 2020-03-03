@@ -9,8 +9,8 @@ public class ArrayQueueModule {
      * n >= 0
      * and for all i : a[i] != null
      */
-    private static Object elements[] = new Object[1];
-    private static int tail = 0, head = 0;
+    private static Object[] elements = new Object[1];
+    private static int size = 0, head = 0;
 
     /**
      * Pre :
@@ -25,8 +25,8 @@ public class ArrayQueueModule {
         assert x != null;
 
         resize(size() + 1);
-        elements[tail] = x;
-        tail = next(tail);
+        elements[(head + size) % elements.length] = x;
+        size++;
     }
 
     /**
@@ -44,6 +44,7 @@ public class ArrayQueueModule {
         resize(size() + 1);
         head = prev(head);
         elements[head] = x;
+        size++;
     }
 
     /**
@@ -56,7 +57,7 @@ public class ArrayQueueModule {
      * and Result = a[0]'
      */
     public static Object element() {
-        assert tail != head;
+         assert size != 0;
 
         return elements[head];
     }
@@ -71,7 +72,7 @@ public class ArrayQueueModule {
      * and Result = a[n - 1]'
      */
     public static Object peek() {
-        return elements[prev(tail)];
+        return elements[(head + size - 1) % elements.length];
     }
 
     /**
@@ -86,6 +87,7 @@ public class ArrayQueueModule {
     public static Object dequeue() {
         Object x = element();
         head = next(head);
+        size--;
         return x;
     }
 
@@ -100,8 +102,7 @@ public class ArrayQueueModule {
      */
     public static Object remove() {
         Object x = peek();
-        tail = prev(tail);
-        elements[tail] = null;
+        elements[(head + (--size)) % elements.length] = null;
         return x;
     }
 
@@ -141,11 +142,7 @@ public class ArrayQueueModule {
      * and a[i'] = a[i] for i in 0..n-1
      */
     public static int size() {
-        if (head > tail) {
-            return elements.length - head + tail;
-        } else {
-            return tail - head;
-        }
+        return size;
     }
 
     /**
@@ -160,14 +157,12 @@ public class ArrayQueueModule {
         if (size == elements.length) {
             Object[] arr = new Object[2 * elements.length];
             int sz = 0;
-            while (tail != head) {
+            for (int i = 0; i < size; i++) {
                 arr[sz++] = elements[head];
                 head = next(head);
             }
-            arr[sz++] = elements[head];
             elements = arr;
             head = 0;
-            tail = sz - 1;
         }
     }
 
@@ -180,9 +175,8 @@ public class ArrayQueueModule {
      * n' = n
      * and a[i'] = a[i] for i in 0..n-1
      */
-
     public static boolean isEmpty() {
-        return tail == head;
+        return size == 0;
     }
 
     /**
@@ -193,7 +187,7 @@ public class ArrayQueueModule {
      * n' = 0
      */
     public static void clear() {
-        tail = head = 0;
+        size = head = 0;
         elements = new Object[1];
     }
 
