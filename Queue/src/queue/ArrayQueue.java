@@ -115,7 +115,7 @@ public class ArrayQueue {
      *
      * Post:
      * Result = a[ind]
-     * and a[i]' = a[i] for i in 0..n-1
+     * and a[i]' = a[i] for i in 0..n - 1
      */
     public Object get(int ind) {
         return elements[(head + ind) % elements.length];
@@ -123,13 +123,12 @@ public class ArrayQueue {
 
     /**
      * Pre:
-     * ind in 0..size
+     * ind in 0..size-1
      * el != null
      *
      * Post:
-     * a[i]' = a[i] for i in 0..ind-1
-     * and a[i]' = a[i] for i in ind+1..n-1
-     * a[ind]' = el
+     * (a[i]' = a[i] for i in 0..n - 1 and i != ind)
+     * and a[ind]' = el
      */
     public void set(int ind, Object el) {
         elements[(head + ind) % elements.length] = el;
@@ -148,7 +147,6 @@ public class ArrayQueue {
         return size;
     }
 
-
     /**
      * Pre:
      * sz >= 0
@@ -161,9 +159,8 @@ public class ArrayQueue {
         if (size == elements.length) {
             Object[] arr = new Object[2 * elements.length];
 
-            int shift = Math.min(elements.length - head, size);
-            System.arraycopy(elements, head, arr, 0, shift);
-            System.arraycopy(elements, 0, arr, shift, size - shift);
+            System.arraycopy(elements, head, arr, 0, elements.length - head);
+            System.arraycopy(elements, 0, arr, elements.length - head, head);
 
             elements = arr;
             head = 0;

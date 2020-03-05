@@ -136,9 +136,8 @@ public class ArrayQueueADT {
      * and el != null
      *
      * Post:
-     * a[i]' = a[i] for i in 0..ind-1
-     * and a[i]' = a[i] for i in ind+1..n-1
-     * a[ind]' = el
+     * (a[i]' = a[i] for i in 0..n - 1 and i != ind)
+     * and a[ind]' = el
      */
     public static void set(ArrayQueueADT queue, int ind, Object element) {
         queue.elements[(queue.head + ind) % queue.elements.length] = element;
@@ -171,9 +170,8 @@ public class ArrayQueueADT {
         if (size == queue.elements.length) {
             Object[] arr = new Object[2 * queue.elements.length];
 
-            int shift = Math.min(queue.elements.length - queue.head, size);
-            System.arraycopy(queue.elements, queue.head, arr, 0, shift);
-            System.arraycopy(queue.elements, 0, arr, shift, size - shift);
+            System.arraycopy(queue.elements, queue.head, arr, 0, queue.elements.length - queue.head);
+            System.arraycopy(queue.elements, 0, arr, queue.elements.length - queue.head, queue.head);
 
             queue.elements = arr;
             queue.head = 0;

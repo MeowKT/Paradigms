@@ -124,9 +124,8 @@ public class ArrayQueueModule {
      * el != null
      *
      * Post:
-     * a[i]' = a[i] for i in 0..ind-1
-     * and a[i]' = a[i] for i in ind+1..n-1
-     * a[ind]' = el
+     * (a[i]' = a[i] for i in 0..n - 1 and i != ind)
+     * and a[ind]' = el
      */
     public static void set(int ind, Object element) {
         elements[(head + ind) % elements.length] = element;
@@ -157,9 +156,8 @@ public class ArrayQueueModule {
         if (size == elements.length) {
             Object[] arr = new Object[2 * elements.length];
 
-            int shift = Math.min(elements.length - head, size);
-            System.arraycopy(elements, head, arr, 0, shift);
-            System.arraycopy(elements, 0, arr, shift, size - shift);
+            System.arraycopy(elements, head, arr, 0, elements.length - head);
+            System.arraycopy(elements, 0, arr, elements.length - head, head);
 
             elements = arr;
             head = 0;
