@@ -3,8 +3,7 @@ package queue;
 // n - count elements
 // a - sequence
 
-
-public class ArrayQueue extends AbstractQueue implements Queue {
+public class ArrayQueue extends AbstractQueue {
     private Object[] elements;
     private int head;
 
@@ -44,6 +43,16 @@ public class ArrayQueue extends AbstractQueue implements Queue {
     public void clearImpl() {
         head = 0;
         elements = new Object[1];
+    }
+
+    @Override
+    protected Queue clone() {
+        ArrayQueue queue = new ArrayQueue();
+        queue.elements = new Object[elements.length];
+        queue.head = head;
+        queue.size = size;
+        System.arraycopy(elements, 0, queue.elements, 0, elements.length);
+        return queue;
     }
 
     private int next(int x) {

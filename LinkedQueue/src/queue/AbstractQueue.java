@@ -1,6 +1,9 @@
 package queue;
 
-public abstract class AbstractQueue implements Queue {
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+public abstract class AbstractQueue implements Queue, Cloneable {
     protected int size;
 
     public void enqueue(Object elem) {
@@ -43,4 +46,26 @@ public abstract class AbstractQueue implements Queue {
     }
 
     protected abstract void clearImpl();
+
+    @Override
+    protected abstract Queue clone();
+
+    public Queue map(Function<Object, Object> function) {
+        Queue queue = clone();
+        for (int i = 0; i < queue.size(); i++) {
+            queue.enqueue(function.apply(queue.dequeue()));
+        }
+        return queue;
+    }
+
+    public Queue filter(Predicate<Object> predicate) {
+        Queue queue = clone();
+        for (int i = 0; i < size(); i++) {
+            Object x = queue.dequeue();
+            if (predicate.test(x)) {
+                queue.enqueue(x);
+            }
+        }
+        return queue;
+    }
 }
