@@ -1,7 +1,5 @@
 package expression.operators;
 
-import java.util.Objects;
-
 public class Variable<T> implements TripleExpression<T> {
     private String var;
 
@@ -14,7 +12,6 @@ public class Variable<T> implements TripleExpression<T> {
         switch (var) {
             case("x") : return x;
             case("y") : return y;
-            case("z") : return z;
             default: return z;
         }
 
@@ -25,17 +22,4 @@ public class Variable<T> implements TripleExpression<T> {
         return var;
     }
 
-    @Override
-    public boolean equals(Object object) {
-        if (object == null || getClass() != object.getClass()) {
-            return false;
-        }
-        Variable variable = (Variable) object;
-        return Objects.equals(var, variable.var);
-    }
-
-    @Override
-    public int hashCode() {
-        return 313 * Objects.hash(var);
-    }
 }

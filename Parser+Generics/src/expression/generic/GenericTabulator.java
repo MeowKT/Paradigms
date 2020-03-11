@@ -20,7 +20,11 @@ public class GenericTabulator implements Tabulator {
 
     @Override
     public Object[][][] tabulate(String mode, String expression, int x1, int x2, int y1, int y2, int z1, int z2) {
-        return makeTable(MODES.get(mode), expression, x1, x2, y1, y2, z1, z2);
+        try {
+            return makeTable(MODES.get(mode), expression, x1, x2, y1, y2, z1, z2);
+        } catch (NullPointerException e) {
+            throw new ComputationalException(mode + " not supported");
+        }
     }
 
     private <T extends Number> Object[][][] makeTable(Operation<T> operator, String expression, int x1, int x2, int y1, int y2, int z1, int z2) {
@@ -32,7 +36,7 @@ public class GenericTabulator implements Tabulator {
                 for (int z = 0; z <= z2 - z1; z++) {
                     try {
                         ans[x][y][z] = tripleExpression.evaluate(operator.parse(Integer.toString(x + x1)), operator.parse(Integer.toString(y + y1)), operator.parse(Integer.toString(z + z1)));
-                    } catch (ParsingException | ComputationalException e) {
+                    } catch (ComputationalException e) {
                         ans[x][y][z] = null;
                     }
                 }

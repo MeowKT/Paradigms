@@ -3,7 +3,6 @@ package expression.operation;
 
 import expression.exceptions.IllegalOperationException;
 import expression.exceptions.OverflowException;
-import expression.operation.Operation;
 
 import static java.lang.Integer.signum;
 import static java.lang.Math.abs;
@@ -16,6 +15,7 @@ public class IntegerOperation implements Operation<Integer> {
         return Integer.parseInt(number);
     }
 
+    @Override
     public Integer add(Integer x, Integer y) {
         if (y > 0 && Integer.MAX_VALUE - y < x) {
             throw new OverflowException("Add");
@@ -25,6 +25,7 @@ public class IntegerOperation implements Operation<Integer> {
         return x + y;
     }
 
+    @Override
     public Integer subtract(Integer x, Integer y) {
         if (y < 0 && x > Integer.MAX_VALUE + y) {
             throw new OverflowException("Subtract");
@@ -45,6 +46,7 @@ public class IntegerOperation implements Operation<Integer> {
         return Integer.parseInt(x);
     }
 
+    @Override
     public Integer divide(Integer x, Integer y) {
         if (y == 0) {
             throw new IllegalOperationException("Divide by zero");
@@ -55,6 +57,7 @@ public class IntegerOperation implements Operation<Integer> {
         return x / y;
     }
 
+    @Override
     public Integer multiply(Integer x, Integer y) {
         if (x == 0 || y == 0 || x == 1 || y == 1) {
             return x * y;

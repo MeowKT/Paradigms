@@ -1,8 +1,6 @@
 package expression.operation;
 
-import expression.exceptions.ComputationalException;
 import expression.exceptions.IllegalOperationException;
-import expression.operation.Operation;
 
 import java.math.BigInteger;
 
@@ -30,7 +28,7 @@ public class BigIntegerOperation implements Operation<BigInteger> {
 
     @Override
     public BigInteger divide(BigInteger x, BigInteger y) {
-        if (y.equals(new BigInteger("0"))) {
+        if (y.equals(BigInteger.ZERO)) {
             throw new IllegalOperationException("Divide by zero: ");
         }
         return x.divide(y);

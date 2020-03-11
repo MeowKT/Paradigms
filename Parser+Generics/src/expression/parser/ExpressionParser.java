@@ -69,6 +69,9 @@ public class ExpressionParser<T extends Number> extends BaseParser {
             }
             st.setLength(st.length() - 1);
             lastBinaryOperator = prefixToBinaryOperator.get(st.toString());
+            if (st.length() > 0) {
+                expect(lastBinaryOperator.toString().substring(st.length()));
+            }
         }
         return lastBinaryOperator != BinaryOperator.UNDEFINED && lastBinaryOperator.getLvl() == level;
     }
@@ -85,7 +88,7 @@ public class ExpressionParser<T extends Number> extends BaseParser {
             st.setLength(st.length() - 1);
             lastUnaryOperator = prefixToUnaryOperator.get(st.toString());
             if (st.length() > 0) {
-                expect(lastUnaryOperator.toString().substring(1));
+                expect(lastUnaryOperator.toString().substring(st.length()));
             }
         }
         return lastUnaryOperator != UnaryOperator.Undefined;
