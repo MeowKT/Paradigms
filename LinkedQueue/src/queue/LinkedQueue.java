@@ -26,17 +26,6 @@ public class LinkedQueue extends AbstractQueue {
         head = tail = null;
     }
 
-    @Override
-    protected Queue clone() {
-        LinkedQueue result = new LinkedQueue();
-        Node temp = head;
-        while (temp != null) {
-            result.enqueue(temp.value);
-            temp = temp.next;
-        }
-        return result;
-    }
-
     private class Node {
         private Object value;
         private Node next;

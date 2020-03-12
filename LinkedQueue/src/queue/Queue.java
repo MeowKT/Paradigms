@@ -1,5 +1,7 @@
 package queue;
 
+import java.util.function.Predicate;
+
 public interface Queue {
     /**
      * Inv :
@@ -28,6 +30,60 @@ public interface Queue {
      * and Result = a[0]'
      */
     Object element();
+
+    /**
+     * Pre:
+     * predicate != null
+     *
+     * Post :
+     * n' <= n
+     * and a[i] in a' if predicate(a[i]) == true
+     * and for all i != j in 0..n - 1:
+     * if (i < j and a[i] in a' and a[j] in a') --> index(a[i]) in a' < index(a[j]) in a'
+     */
+    void retainIf(Predicate<Object> predicate);
+
+    /**
+     * Pre:
+     * predicate != null
+     *
+     * Post :
+     * n' <= n
+     * and a[i] in a' if predicate(a[i]) == false
+     * and for all i != j in 0..n - 1:
+     * if (i < j and a[i] in a' and a[j] in a') --> index(a[i]) in a' < index(a[j]) in a'
+     */
+    void removeIf(Predicate<Object> predicate);
+
+    /**
+     * Pre:
+     * predicate != null
+     *
+     * Post :
+     * n' <= n
+     * and n' == 0 or (exist k:
+     * a[i] in a' if i in k..n-1
+     * and predicate(a[k]) == false
+     * and predicate(a[j]) == true for j in 0..k-1
+     * and for all i != j in 0..n - 1:
+     * if (i < j and a[i] in a' and a[j] in a') --> index(a[i]) in a' < index(a[j]) in a')
+     */
+    void dropWhile(Predicate<Object> predicate);
+
+    /**
+     * Pre:
+     * predicate != null
+     *
+     * Post :
+     * n' <= n
+     * and n' = 0 or (exist k :
+     * a[i] in a' for i in 0..k-1
+     * and predicate(a[i]) == true
+     * and predicate(a[k]) == false
+     * and for all i != j in 0..n - 1:
+     * if (i < j and a[i] in a' and a[j] in a') --> index(a[i]) in a' < index(a[j]) in a')
+     */
+    void takeWhile(Predicate<Object> predicate);
 
     /**
      * Pre:
@@ -70,4 +126,6 @@ public interface Queue {
      * n' = 0
      */
     void clear();
+
+
 }

@@ -1,9 +1,11 @@
 package queue;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
-public abstract class AbstractQueue implements Queue, Cloneable {
+public abstract class AbstractQueue implements Queue {
     protected int size;
 
     public void enqueue(Object elem) {
@@ -47,25 +49,48 @@ public abstract class AbstractQueue implements Queue, Cloneable {
 
     protected abstract void clearImpl();
 
-    @Override
-    protected abstract Queue clone();
-
-    public Queue map(Function<Object, Object> function) {
-        Queue queue = clone();
-        for (int i = 0; i < queue.size(); i++) {
-            queue.enqueue(function.apply(queue.dequeue()));
-        }
-        return queue;
+    public void removeIf(Predicate<Object> predicate) {
+        doIf(predicate.negate());
     }
 
-    public Queue filter(Predicate<Object> predicate) {
-        Queue queue = clone();
-        for (int i = 0; i < size(); i++) {
-            Object x = queue.dequeue();
+    public void retainIf(Predicate<Object> predicate) {
+        doIf(predicate);
+    }
+
+    public void takeWhile(Predicate<Object> predicate) {
+        doWhile(predicate, queue -> enqueue(dequeue()), t -> t);
+    }
+
+    public void dropWhile(Predicate<Object> predicate) {
+        doWhile(predicate, queue -> dequeue(), t -> 0);
+    }
+
+    public void doIf(Predicate<Object> predicate) {
+        int sz = size;
+        for (int i = 0; i < sz; i++) {
+            Object x = dequeue();
             if (predicate.test(x)) {
-                queue.enqueue(x);
+                enqueue(x);
             }
         }
-        return queue;
+    }
+
+    public void doWhile(Predicate<Object> predicate, Consumer<Queue> consumer, UnaryOperator<Integer> unaryOperator) {
+        int sz = size;
+        for (int i = 0; i < sz; i++) {
+            Object x = element();
+            if (predicate.test(x)) {
+                consumer.accept(this);
+            } else {
+                deleteFirstElements(unaryOperator.apply(sz - i));
+                return;
+            }
+        }
+    }
+
+    private void deleteFirstElements(int cnt) {
+        for (int i = 0; i < cnt; i++) {
+            dequeue();
+        }
     }
 }
