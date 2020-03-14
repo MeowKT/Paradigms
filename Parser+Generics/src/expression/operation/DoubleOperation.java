@@ -4,11 +4,6 @@ package expression.operation;
 public class DoubleOperation implements Operation<Double> {
 
     @Override
-    public Double parseNumber(String number) {
-        return Double.parseDouble(number);
-    }
-
-    @Override
     public Double add(Double x, Double y) {
         return x + y;
     }
@@ -36,5 +31,20 @@ public class DoubleOperation implements Operation<Double> {
     @Override
     public Double parse(String x) {
         return Double.parseDouble(x);
+    }
+
+    @Override
+    public Double min(Double x, Double y) {
+        return Double.min(x, y);
+    }
+
+    @Override
+    public Double max(Double x, Double y) {
+        return Double.max(x, y);
+    }
+
+    @Override
+    public Double count(Double x) {
+        return (double)Long.bitCount(Double.doubleToLongBits(x));
     }
 }

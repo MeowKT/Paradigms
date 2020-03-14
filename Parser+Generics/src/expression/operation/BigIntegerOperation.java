@@ -7,11 +7,6 @@ import java.math.BigInteger;
 public class BigIntegerOperation implements Operation<BigInteger> {
 
     @Override
-    public BigInteger parseNumber(String number) {
-        return new BigInteger(number);
-    }
-
-    @Override
     public BigInteger add(BigInteger x, BigInteger y) {
         return x.add(y);
     }
@@ -42,5 +37,20 @@ public class BigIntegerOperation implements Operation<BigInteger> {
     @Override
     public BigInteger parse(String x) {
         return new BigInteger(x);
+    }
+
+    @Override
+    public BigInteger min(BigInteger x, BigInteger y) {
+        return x.min(y);
+    }
+
+    @Override
+    public BigInteger max(BigInteger x, BigInteger y) {
+        return x.max(y);
+    }
+
+    @Override
+    public BigInteger count(BigInteger x) {
+        return new BigInteger(Integer.toString(x.bitCount()));
     }
 }

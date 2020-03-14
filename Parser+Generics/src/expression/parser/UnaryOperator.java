@@ -3,10 +3,11 @@ package expression.parser;
 import java.util.Map;
 
 public enum UnaryOperator {
-    Minus, Undefined;
+    Minus, BitCount, Undefined;
     private static final Map<UnaryOperator, String> operatorToString = Map.of(
             Undefined, "",
-            Minus, "-"
+            Minus, "-",
+            BitCount, "count"
     );
 
     @Override

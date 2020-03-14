@@ -6,7 +6,7 @@ import expression.operators.*;
 
 import java.util.Map;
 
-public class ExpressionParser<T extends Number> extends BaseParser {
+public class ExpressionParser<T> extends BaseParser {
 
     private final Operation<T> modeOperator;
 
@@ -15,12 +15,15 @@ public class ExpressionParser<T extends Number> extends BaseParser {
             "+", BinaryOperator.Add,
             "-", BinaryOperator.Sub,
             "*", BinaryOperator.Mul,
-            "/", BinaryOperator.Div
+            "/", BinaryOperator.Div,
+             "m", BinaryOperator.Min,
+             "ma", BinaryOperator.Max
      );
 
      private static Map<String, UnaryOperator> prefixToUnaryOperator = Map.of(
              "", UnaryOperator.Undefined,
-             "-", UnaryOperator.Minus
+             "-", UnaryOperator.Minus,
+             "c", UnaryOperator.BitCount
      );
 
     private BinaryOperator lastBinaryOperator = BinaryOperator.UNDEFINED;
@@ -55,6 +58,7 @@ public class ExpressionParser<T extends Number> extends BaseParser {
             lastBinaryOperator = BinaryOperator.UNDEFINED;
             result = makeBinaryExpression(op, result, parseLevel(level + 1));
         }
+        //System.out.println(result);
         return result;
     }
 
@@ -111,9 +115,10 @@ public class ExpressionParser<T extends Number> extends BaseParser {
             lastUnaryOperator = UnaryOperator.Undefined;
             if (between('0', '9')) {
                 return parseConstExpression(true);
-            } else {
+            } else if (op == UnaryOperator.Minus){
                 return new Negate<T>(parseSimpleExpression(), modeOperator);
             }
+            return makeUnaryExpression(op, parseSimpleExpression());
         } else {
             return parseVariableExpression();
         }
@@ -142,12 +147,21 @@ public class ExpressionParser<T extends Number> extends BaseParser {
         return new Variable<T>(st.toString());
     }
 
+    private TripleExpression<T> makeUnaryExpression(UnaryOperator operator, TripleExpression<T> a) {
+        switch (operator) {
+            case BitCount : return new Count<>(a, modeOperator);
+            default: throw new UnsupportedOperatorException("unary operator: " + operator, pos);
+        }
+    }
+
     private TripleExpression<T> makeBinaryExpression(BinaryOperator operator, TripleExpression<T> a, TripleExpression<T> b) {
         switch (operator) {
             case Add : return new Add<>(a, b, modeOperator);
             case Sub : return new Subtract<>(a, b, modeOperator);
             case Mul : return new Multiply<>(a, b, modeOperator);
             case Div : return new Divide<>(a, b, modeOperator);
+            case Min : return new Min<>(a, b, modeOperator);
+            case Max : return new Max<>(a, b, modeOperator);
             default: throw new UnsupportedOperatorException("binary operator: " + operator, pos);
         }
     }
