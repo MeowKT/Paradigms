@@ -37,9 +37,15 @@ public interface Queue {
      *
      * Post :
      * n' <= n
-     * and a[i] in a' if predicate(a[i]) == true
-     * and for all i != j in 0..n - 1:
-     * if (i < j and a[i] in a' and a[j] in a') --> index(a[i]) in a' < index(a[j]) in a'
+     * Exists sequence i_0, i_1..i_n'-1:
+     * 0 <= i_0 < i_1 < .. < i_n'-1 <= n - 1
+     *
+     * and for (j in 0..n'-1):
+     * a[j]' = a[i_j]
+     * and predicate(a[i_j]) == true
+     *
+     * and for (k in 0..n - 1)
+     * if (k != i_0 and k != i_1 and ... and k != i_(n'-1)) -> predicate(a[k]) == false
      */
     void retainIf(Predicate<Object> predicate);
 
@@ -49,9 +55,15 @@ public interface Queue {
      *
      * Post :
      * n' <= n
-     * and a[i] in a' if predicate(a[i]) == false
-     * and for all i != j in 0..n - 1:
-     * if (i < j and a[i] in a' and a[j] in a') --> index(a[i]) in a' < index(a[j]) in a'
+     * Exists sequence i_0, i_1..i_n'-1:
+     * 0 <= i_0 < i_1 < .. < i_n'-1 <= n - 1
+     *
+     * and for (j in 0..n'-1):
+     * a[j]' = a[i_j]
+     * and predicate(a[i_j]) == false
+     *
+     * and for (k in 0..n - 1)
+     * if (k != i_0 and k != i_1 and ... and k != i_(n'-1)) -> predicate(a[k]) == true
      */
     void removeIf(Predicate<Object> predicate);
 
@@ -61,12 +73,13 @@ public interface Queue {
      *
      * Post :
      * n' <= n
-     * and n' == 0 or (exist k:
-     * a[i] in a' if i in k..n-1
-     * and predicate(a[k]) == false
-     * and predicate(a[j]) == true for j in 0..k-1
-     * and for all i != j in 0..n - 1:
-     * if (i < j and a[i] in a' and a[j] in a') --> index(a[i]) in a' < index(a[j]) in a')
+     * exists k:
+     * n' = n - k
+     * for (i in k..n - 1)
+     *    a[i - k]' = a[i]
+     * and for (i in 0..k - 1)
+     *    predicate(a[i]) = false
+     * and (k == n) or (predicate(a[k]) = true)
      */
     void dropWhile(Predicate<Object> predicate);
 
@@ -76,12 +89,9 @@ public interface Queue {
      *
      * Post :
      * n' <= n
-     * and n' = 0 or (exist k :
-     * a[i] in a' for i in 0..k-1
-     * and predicate(a[i]) == true
-     * and predicate(a[k]) == false
-     * and for all i != j in 0..n - 1:
-     * if (i < j and a[i] in a' and a[j] in a') --> index(a[i]) in a' < index(a[j]) in a')
+     * for (i in 0..(n' -1)):
+     * a[i]' = a[i] and predicate(a[i]) == true
+     * and (n' == n) or (n' < n -> predicate(a[n']) == false)
      */
     void takeWhile(Predicate<Object> predicate);
 

@@ -1,7 +1,5 @@
 package queue;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
@@ -57,17 +55,9 @@ public abstract class AbstractQueue implements Queue {
         doIf(predicate);
     }
 
-    public void takeWhile(Predicate<Object> predicate) {
-        doWhile(predicate, queue -> enqueue(dequeue()), t -> t);
-    }
-
-    public void dropWhile(Predicate<Object> predicate) {
-        doWhile(predicate, queue -> dequeue(), t -> 0);
-    }
-
     public void doIf(Predicate<Object> predicate) {
-        int sz = size;
-        for (int i = 0; i < sz; i++) {
+        int oldSize = size;
+        for (int i = 0; i < oldSize; i++) {
             Object x = dequeue();
             if (predicate.test(x)) {
                 enqueue(x);
@@ -75,12 +65,25 @@ public abstract class AbstractQueue implements Queue {
         }
     }
 
-    public void doWhile(Predicate<Object> predicate, Consumer<Queue> consumer, UnaryOperator<Integer> unaryOperator) {
+    public void takeWhile(Predicate<Object> predicate) {
+        doWhile(predicate, () -> enqueue(dequeue()), t -> t);
+    }
+
+    public void dropWhile(Predicate<Object> predicate) {
+        doWhile(predicate, () -> dequeue(), t -> 0);
+    }
+
+    @FunctionalInterface
+    interface QueueOperation {
+        void operate();
+    }
+
+    private void doWhile(Predicate<Object> predicate, QueueOperation operation, UnaryOperator<Integer> unaryOperator) {
         int sz = size;
         for (int i = 0; i < sz; i++) {
             Object x = element();
             if (predicate.test(x)) {
-                consumer.accept(this);
+                operation.operate();
             } else {
                 deleteFirstElements(unaryOperator.apply(sz - i));
                 return;
