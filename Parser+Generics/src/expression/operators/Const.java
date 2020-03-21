@@ -1,20 +1,22 @@
 package expression.operators;
 
-public class Const <T> implements TripleExpression<T> {
-    private T val;
+import expression.operation.Operation;
 
-    public Const(T val) {
+public class Const implements GenericExpression {
+    private String val;
+
+    public Const(String val, Operation op) {
         this.val = val;
     }
 
     @Override
-    public T evaluate(T x, T y, T z) {
-        return val;
+    public <T> T evaluate(T x, T y, T z, Operation<T> op) {
+        return op.parse(val);
     }
 
     @Override
     public String toString() {
-        return val.toString();
+        return val;
     }
 
 }

@@ -1,6 +1,8 @@
 package expression.operators;
 
-public class Variable<T> implements TripleExpression<T> {
+import expression.operation.Operation;
+
+public class Variable implements GenericExpression {
     private String var;
 
     public Variable(String var) {
@@ -8,7 +10,7 @@ public class Variable<T> implements TripleExpression<T> {
     }
 
     @Override
-    public T evaluate(T x, T y, T z) {
+    public <T> T evaluate(T x, T y, T z, Operation<T> op) {
         switch (var) {
             case("x") : return x;
             case("y") : return y;

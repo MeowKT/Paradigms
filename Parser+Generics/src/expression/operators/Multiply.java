@@ -2,10 +2,10 @@ package expression.operators;
 
 import expression.operation.Operation;
 
-public class Multiply<T> extends AbstractBinaryOperator<T> {
+public class Multiply extends AbstractBinaryOperator {
 
-    public Multiply(TripleExpression<T> left, TripleExpression<T> right, Operation<T> op) {
-        super(left, right, op);
+    public Multiply(GenericExpression left, GenericExpression right) {
+        super(left, right);
     }
     @Override
     protected String getOperator() {
@@ -13,7 +13,7 @@ public class Multiply<T> extends AbstractBinaryOperator<T> {
     }
 
     @Override
-    protected T calc(T x, T y) {
+    protected <T> T calc(T x, T y, Operation<T> op) {
         return op.multiply(x, y);
     }
 

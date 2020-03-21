@@ -3,14 +3,14 @@ package expression.operators;
 import expression.exceptions.OverflowException;
 import expression.operation.Operation;
 
-public class Count<T> extends AbstractUnaryOperator<T> {
+public class Count extends AbstractUnaryOperator {
 
-    public Count(TripleExpression<T> expression, Operation<T> op) {
-        super(expression, op);
+    public Count(GenericExpression expression) {
+        super(expression);
     }
 
     @Override
-    public T operate(T x) throws OverflowException {
+    public <T> T operate(T x, Operation<T> op) throws OverflowException {
         return op.count(x);
     }
 

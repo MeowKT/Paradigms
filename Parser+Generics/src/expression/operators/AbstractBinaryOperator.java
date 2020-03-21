@@ -3,23 +3,21 @@ package expression.operators;
 import expression.exceptions.ComputationalException;
 import expression.operation.Operation;
 
-abstract class AbstractBinaryOperator<T> implements TripleExpression<T> {
-    private TripleExpression<T> left;
-    private TripleExpression<T> right;
-    protected final Operation<T> op;
+abstract class AbstractBinaryOperator implements GenericExpression {
+    private GenericExpression left;
+    private GenericExpression right;
 
-    protected abstract T calc(T x, T y) throws ComputationalException;
+    protected abstract <T> T calc(T x, T y, Operation<T> op) throws ComputationalException;
 
     protected abstract String getOperator();
 
-    public AbstractBinaryOperator(TripleExpression<T> left, TripleExpression<T> right, Operation<T> op) {
+    public AbstractBinaryOperator(GenericExpression left, GenericExpression right) {
         this.left = left;
         this.right = right;
-        this.op = op;
     }
 
-    public T evaluate(T x, T y, T z) throws ComputationalException {
-        return calc(left.evaluate(x, y, z), right.evaluate(x, y, z));
+    public <T> T evaluate(T x, T y, T z, Operation<T> op) throws ComputationalException {
+        return calc(left.evaluate(x, y, z, op), right.evaluate(x, y, z, op), op);
     }
 
     @Override

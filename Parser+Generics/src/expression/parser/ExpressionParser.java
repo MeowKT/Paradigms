@@ -6,9 +6,9 @@ import expression.operators.*;
 
 import java.util.Map;
 
-public class ExpressionParser<T> extends BaseParser {
+public class ExpressionParser extends BaseParser implements Parser {
 
-    private final Operation<T> modeOperator;
+    private final Operation modeOperator;
 
      private static Map<String, BinaryOperator> prefixToBinaryOperator = Map.of(
             "", BinaryOperator.UNDEFINED,
@@ -30,35 +30,34 @@ public class ExpressionParser<T> extends BaseParser {
     private UnaryOperator lastUnaryOperator = UnaryOperator.Undefined;
     private static final int MAX_LEVEL = 3;
 
-    public ExpressionParser(Operation<T> modeOperator) {
+    public ExpressionParser(Operation modeOperator) {
         this.modeOperator = modeOperator;
     }
 
-    public TripleExpression<T> parse(String expression) {
+    public GenericExpression parse(String expression) {
         setSource(new StringSource(expression));
         nextChar();
-        TripleExpression<T> result = parseExpression();
+        GenericExpression result = parseExpression();
         if (test('\0')) {
             return result;
         }
         throw new UnknownSymbolException(ch + "", pos);
     }
 
-    private TripleExpression<T> parseExpression() {
+    private GenericExpression parseExpression() {
         return parseLevel(0);
     }
 
-    private TripleExpression<T> parseLevel(int level) {
+    private GenericExpression parseLevel(int level) {
         if (level == MAX_LEVEL) {
             return parseSimpleExpression();
         }
-        TripleExpression<T> result = parseLevel(level + 1);
+        GenericExpression result = parseLevel(level + 1);
         while (hasBinaryOperationOnLevel(level)) {
             BinaryOperator op = lastBinaryOperator;
             lastBinaryOperator = BinaryOperator.UNDEFINED;
             result = makeBinaryExpression(op, result, parseLevel(level + 1));
         }
-        //System.out.println(result);
         return result;
     }
 
@@ -98,10 +97,10 @@ public class ExpressionParser<T> extends BaseParser {
         return lastUnaryOperator != UnaryOperator.Undefined;
     }
 
-    private TripleExpression<T> parseSimpleExpression() {
+    private GenericExpression parseSimpleExpression() {
         skipWhitespace();
         if (test('(')) {
-            TripleExpression<T> result = parseExpression();
+            GenericExpression result = parseExpression();
             skipWhitespace();
             if (ch != ')') {
                 throw new MissingBracketException("close", pos);
@@ -116,26 +115,26 @@ public class ExpressionParser<T> extends BaseParser {
             if (between('0', '9')) {
                 return parseConstExpression(true);
             } else if (op == UnaryOperator.Minus){
-                return new Negate<T>(parseSimpleExpression(), modeOperator);
+                return new Negate(parseSimpleExpression(), modeOperator);
             }
             return makeUnaryExpression(op, parseSimpleExpression());
         } else {
             return parseVariableExpression();
         }
     }
-    private TripleExpression<T> parseConstExpression(boolean isNegative) {
+    private GenericExpression parseConstExpression(boolean isNegative) {
         StringBuilder st = new StringBuilder(isNegative ? "-" : "");
         while (between('0', '9')) {
             st.append(ch);
             nextChar();
         }
         try {
-            return new Const<T>(modeOperator.parse(st.toString()));
+            return new Const(st.toString(), modeOperator);
         } catch (NumberFormatException e) {
             throw new IllegalConstantException("Constant overflow: " + st, pos);
         }
     }
-    private TripleExpression<T> parseVariableExpression() {
+    private GenericExpression parseVariableExpression() {
         StringBuilder st = new StringBuilder();
         while (between('x', 'z')) {
             st.append(ch);
@@ -144,24 +143,24 @@ public class ExpressionParser<T> extends BaseParser {
         if (st.length() == 0) {
             throw new MissingArgumentException(ch, pos);
         }
-        return new Variable<T>(st.toString());
+        return new Variable(st.toString());
     }
 
-    private TripleExpression<T> makeUnaryExpression(UnaryOperator operator, TripleExpression<T> a) {
+    private GenericExpression makeUnaryExpression(UnaryOperator operator, GenericExpression a) {
         switch (operator) {
-            case BitCount : return new Count<>(a, modeOperator);
+            case BitCount : return new Count(a);
             default: throw new UnsupportedOperatorException("unary operator: " + operator, pos);
         }
     }
 
-    private TripleExpression<T> makeBinaryExpression(BinaryOperator operator, TripleExpression<T> a, TripleExpression<T> b) {
+    private GenericExpression makeBinaryExpression(BinaryOperator operator, GenericExpression a, GenericExpression b) {
         switch (operator) {
-            case Add : return new Add<>(a, b, modeOperator);
-            case Sub : return new Subtract<>(a, b, modeOperator);
-            case Mul : return new Multiply<>(a, b, modeOperator);
-            case Div : return new Divide<>(a, b, modeOperator);
-            case Min : return new Min<>(a, b, modeOperator);
-            case Max : return new Max<>(a, b, modeOperator);
+            case Add : return new Add(a, b);
+            case Sub : return new Subtract(a, b);
+            case Mul : return new Multiply(a, b);
+            case Div : return new Divide(a, b);
+            case Min : return new Min(a, b);
+            case Max : return new Max(a, b);
             default: throw new UnsupportedOperatorException("binary operator: " + operator, pos);
         }
     }

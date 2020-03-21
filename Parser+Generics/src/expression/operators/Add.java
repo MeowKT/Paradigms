@@ -2,10 +2,10 @@ package expression.operators;
 
 import expression.operation.Operation;
 
-public class Add<T> extends AbstractBinaryOperator<T> {
+public class Add extends AbstractBinaryOperator {
 
-    public Add(TripleExpression<T> left, TripleExpression<T> right, final Operation<T> op) {
-        super(left, right, op);
+    public Add(GenericExpression left, GenericExpression right) {
+        super(left, right);
     }
 
     @Override
@@ -14,7 +14,7 @@ public class Add<T> extends AbstractBinaryOperator<T> {
     }
 
     @Override
-    protected T calc(T x, T y) {
+    protected <T> T calc(T x, T y, Operation<T> op) {
         return op.add(x, y);
     }
 

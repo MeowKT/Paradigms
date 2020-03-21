@@ -2,10 +2,10 @@ package expression.operators;
 
 import expression.operation.Operation;
 
-public class Max<T> extends AbstractBinaryOperator <T> {
+public class Max extends AbstractBinaryOperator  {
 
-    public Max(TripleExpression<T> left, TripleExpression<T> right, Operation<T> op) {
-        super(left, right, op);
+    public Max(GenericExpression left, GenericExpression right) {
+        super(left, right);
     }
 
     @Override
@@ -14,7 +14,7 @@ public class Max<T> extends AbstractBinaryOperator <T> {
     }
 
     @Override
-    protected T calc(T x, T y) {
+    protected <T> T calc(T x, T y, Operation<T> op) {
         return op.max(x, y);
     }
 

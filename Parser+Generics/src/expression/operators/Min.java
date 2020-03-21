@@ -2,10 +2,10 @@ package expression.operators;
 
 import expression.operation.Operation;
 
-public class Min<T> extends AbstractBinaryOperator <T> {
+public class Min extends AbstractBinaryOperator  {
 
-    public Min(TripleExpression<T> left, TripleExpression<T> right, Operation<T> op) {
-        super(left, right, op);
+    public Min(GenericExpression left, GenericExpression right) {
+        super(left, right);
     }
 
     @Override
@@ -14,7 +14,7 @@ public class Min<T> extends AbstractBinaryOperator <T> {
     }
 
     @Override
-    protected T calc(T x, T y) {
+    protected <T> T calc(T x, T y, Operation<T> op) {
         return op.min(x, y);
     }
 

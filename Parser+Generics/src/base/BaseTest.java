@@ -1,6 +1,6 @@
 package base;
 
-import expression.operators.TripleExpression;
+import expression.operators.GenericExpression;
 
 import java.util.*;
 
@@ -74,6 +74,6 @@ public abstract strictfp class BaseTest extends Asserts {
      * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
      */
     public static interface Parser {
-        TripleExpression parse(String expression) throws /* Change me */ Exception;
+        GenericExpression parse(String expression) throws /* Change me */ Exception;
     }
 }
