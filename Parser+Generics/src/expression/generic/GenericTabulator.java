@@ -4,7 +4,6 @@ import expression.exceptions.ComputationalException;
 import expression.operation.*;
 import expression.operators.*;
 import expression.parser.ExpressionParser;
-import expression.parser.Parser;
 
 import java.util.Map;
 
@@ -31,7 +30,7 @@ public class GenericTabulator implements Tabulator {
     }
 
     private <T> Object[][][] makeTable(Operation<T> op, String expression, int x1, int x2, int y1, int y2, int z1, int z2) {
-        Parser parser = new ExpressionParser(op);
+        ExpressionParser parser = new ExpressionParser(op);
         GenericExpression commonExpression = parser.parse(expression);
         Object[][][] ans = new Object[x2 - x1 + 1][y2 - y1 + 1][z2 - z1 + 1];
         for (int x = x1; x <= x2; x++) {

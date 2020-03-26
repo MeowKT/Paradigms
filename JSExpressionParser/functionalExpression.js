@@ -26,7 +26,7 @@ const parse = expression => {
 
     const makeUnaryExpression = op => stack.push(op);
 
-    expression.trim().split(/\s+/).forEach(element => {
+    function parseToken(element) {
         if (stringToBinaryOperation[element] !== undefined) {
             makeBinaryExpression(stringToBinaryOperation[element], stack);
         } else if (element === "x") {
@@ -34,6 +34,8 @@ const parse = expression => {
         } else {
             makeUnaryExpression(cnst(parseInt(element)), stack);
         }
-    });
+    }
+
+    expression.trim().split(/\s+/).forEach(parseToken);
     return stack.pop();
 };

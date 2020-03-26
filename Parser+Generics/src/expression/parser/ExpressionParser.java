@@ -6,7 +6,7 @@ import expression.operators.*;
 
 import java.util.Map;
 
-public class ExpressionParser extends BaseParser implements Parser {
+public class ExpressionParser extends BaseParser {
 
     private final Operation modeOperator;
 
