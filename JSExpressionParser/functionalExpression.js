@@ -4,19 +4,22 @@ const cnst = val => () => val;
 const one = cnst(1);
 const two = cnst(2);
 
-const variable = name => (...args) => {
-    return args[variables[name]];
+const variable = name => {
+    let number = variables[name];
+    return (...args) => args[number];
 };
 
 const multiOperator = op => (...expressions) => (...values) => op(...expressions.map(expr => expr(...values)));
 
-const add = (a, b) => multiOperator((a, b) => a + b)(a, b);
-const divide = (a, b) => multiOperator((a, b) => a / b)(a, b);
-const subtract = (a, b) => multiOperator((a, b) => a - b)(a, b);
-const multiply = (a, b) => multiOperator((a, b) => a * b)(a, b);
-const negate = (a) => multiOperator((a) => -a)(a);
-const abs = (a) => multiOperator((a) => Math.abs(a))(a);
-const iff = (a, b, c) => multiOperator((a, b, c) => a >= 0 ? b : c)(a, b, c);
+const associativeOperator = (f, val) => multiOperator((...args) => ([...args].reduce(f, val)));
+const add = associativeOperator((a, b) => a + b, 0);
+const multiply = associativeOperator((a, b) => a * b, 1);
+
+const divide = multiOperator((a, b) => a / b);
+const subtract = multiOperator((a, b) => a - b);
+const negate = multiOperator((a) => -a);
+const abs = multiOperator(Math.abs);
+const iff = multiOperator((a, b, c) => a >= 0 ? b : c);
 
 const variables = {
     "x": 0,
@@ -25,13 +28,13 @@ const variables = {
 };
 
 const operations = {
-    "+": add,
-    "-": subtract,
-    "*": multiply,
-    "/": divide,
-    "negate": negate,
-    "abs": abs,
-    "iff": iff
+    "+": [add, 2],
+    "-": [subtract, 2],
+    "*": [multiply, 2],
+    "/": [divide, 2],
+    "negate": [negate, 1],
+    "abs": [abs, 1],
+    "iff": [iff, 3]
 };
 
 const consts = {
@@ -44,7 +47,9 @@ const parse = expression => {
 
     function parseElement(element) {
         if (element in operations) {
-            stack.push(operations[element](...stack.splice(-(operations[element].length))));
+            let operation = operations[element][0];
+            let cntArgs = operations[element][1];
+            stack.push(operation(...stack.splice(-cntArgs)));
         } else if (element in variables) {
             stack.push(variable(element));
         } else if (element in consts) {
