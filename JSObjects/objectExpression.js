@@ -7,6 +7,9 @@ Const.prototype.evaluate = function (expr) { return this.x; };
 Const.prototype.toString = function () { return this.x.toString(); };
 Const.prototype.diff = function (variable) { return new Const(0); };
 
+const ONE = new Const(1);
+const TWO = new Const(2);
+
 const variables = {
     "x": 0,
     "y": 1,
@@ -39,25 +42,42 @@ MultiExpression.prototype.diff = function(variable) {
 };
 
 function Negate(expr) {
-    MultiExpression.call(this, a => -a, "negate", (name, a) => new Negate(a.diff(name)), expr);
+    MultiExpression.call(this,
+        a => -a,
+        "negate",
+        (name, a) =>
+            new Negate(a.diff(name)),
+        expr);
 }
 Negate.prototype = Object.create(MultiExpression.prototype);
 
 function Add(left, right) {
-    MultiExpression.call(this, (a, b) => a + b, "+", (name, a, b) => new Add(a.diff(name), b.diff(name)), left, right);
+    MultiExpression.call(this,
+        (a, b) => a + b,
+        "+",
+        (name, a, b) =>
+            new Add(a.diff(name), b.diff(name)),
+        left, right);
 }
 Add.prototype = Object.create(MultiExpression.prototype);
 
 function Subtract(left, right) {
-    MultiExpression.call(this, (a, b) => a - b, "-", (name, a, b) => new Subtract(a.diff(name), b.diff(name)), left, right);
+    MultiExpression.call(this,
+        (a, b) => a - b,
+        "-",
+        (name, a, b) =>
+            new Subtract(a.diff(name), b.diff(name)),
+        left, right);
 }
 Subtract.prototype = Object.create(MultiExpression.prototype);
 
 function Multiply(left, right) {
-    MultiExpression.call(
-        this,
+    MultiExpression.call(this,
         (a, b) => a * b, "*",
-        (name, a, b) => new Add(new Multiply(a, b.diff(name)), new Multiply(a.diff(name), b)),
+        (name, a, b) =>
+            new Add(
+                new Multiply(a, b.diff(name)),
+                new Multiply(a.diff(name), b)),
         left, right);
 }
 Multiply.prototype = Object.create(MultiExpression.prototype);
@@ -66,7 +86,12 @@ function Divide(left, right) {
     MultiExpression.call(this,
         (a, b) => a / b,
         "/",
-        (name, a, b) => new Divide(new Subtract(new Multiply(a.diff(name), b), new Multiply(a, b.diff(name))), new Multiply(b, b)),
+        (name, a, b) =>
+            new Divide(
+                new Subtract(
+                    new Multiply(a.diff(name), b),
+                    new Multiply(a, b.diff(name))),
+                new Multiply(b, b)),
         left, right);
 }
 Divide.prototype = Object.create(MultiExpression.prototype);
@@ -75,11 +100,22 @@ function Gauss(a, b, c, x) {
     MultiExpression.call(this,
         (a, b, c, x) => a * Math.exp(-(x - b) * (x - b) / (c * c * 2)),
         "gauss",
-        // (name, a, b, c, x) => new Multiply(new Gauss(a, b, c, x), new Negate(new Divide(
-        //     new Multiply(new Subtract(new Variable(x), new Variable(b)) ,new Subtract(new Variable(x), new Variable(b))),
-        //     new Multiply(new Const(2), new Multiply(new Variable(c), new Variable(c)))
-        // )).diff(name)),
-        // ?? ?? ?? ? ??? ??? ? ?? ? ? ?? ? ?? ? ? ? ??  ?? ? ? ?? ? ? ?? ? ?
+        (name, a, b, c, x) =>
+            new Multiply(
+                new Gauss(ONE, b, c, x),
+                new Add(
+                    a.diff(name),
+                    new Multiply(
+                        a,
+                        new Negate(
+                            new Divide(
+                                new Multiply(
+                                    new Subtract(x, b),
+                                    new Subtract(x, b)),
+                                new Multiply(
+                                    TWO,
+                                    new Multiply(c, c)))).diff(name)))),
+
         a, b, c, x);
 }
 Gauss.prototype = Object.create(MultiExpression.prototype);
@@ -95,7 +131,6 @@ const operations = {
 
 const parse = expression => {
     let stack = [];
-
     function parseElement(element) {
         if (element in operations) {
             let operation = operations[element][0];
